@@ -83,5 +83,5 @@ The CLI does not scaffold entries interactively. Use the **`ffcpe-catalog-entry-
 
 ## Deeper docs
 
-- **`claude-ffcpe/README.md`** — agent skills (Claude **`/`** commands, Cursor paths, marketplace install, **`aio ffcpe install-skills`**, **`aio ffcpe sync-skills`**).
+- **`skills/README.md`** — agent skills (Claude **`/`** commands, Cursor paths, **`npx skills`** install).
 - **`.cursor/ffcpe-catalog/SKILL.md`** — catalog operations via **`aio ffcpe catalog`** (same HTTP API under the hood; do not hand-craft curl).

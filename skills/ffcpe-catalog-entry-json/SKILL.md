@@ -188,6 +188,7 @@ Use HTTPS App Builder / Runtime API URLs (gateway style), not arbitrary untruste
 | `{ "type": "api-key", "headerName": "X-API-Key", "secretName": "MY_API_KEY" }` | API key header; `secretName` references an env var or secret |
 | `{ "type": "bearer", "secretName": "MY_BEARER_TOKEN" }` | Bearer token from env/secret |
 | `{ "type": "ims_service_token" }` | Run-workflow obtains an **IMS service access token** and calls your endpoints with **`x-api-key: run-workflow-service`** and **`Authorization`** set accordingly (no extra fields in the catalog JSON). Use when your App Builder action expects that auth model. |
+
 ## Managing the catalog (Adobe I/O CLI)
 
 Always use **`aio ffcpe catalog …`** (this plugin), not raw HTTP. Prereqs: **`aio login`**, **`aio console org select`**, and this plugin installed. Optional: **`--base-url`** / **`AIO_FFCPE_CATALOG_BASE_URL`**, **`--org-id`**, **`--api-key`**, **`--json`** on commands that support them.

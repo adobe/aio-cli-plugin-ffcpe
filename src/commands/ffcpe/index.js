@@ -20,4 +20,4 @@ export default class FfcpeIndex extends Command {
 }
 
 FfcpeIndex.description =
-  'FFCPE (Firefly Creative Production for Enterprise) — aio ffcpe catalog (catalog API), aio ffcpe install-skills, aio ffcpe sync-skills'
+  'FFCPE (Firefly Creative Production for Enterprise) — aio ffcpe catalog (catalog API)'

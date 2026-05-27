@@ -35,9 +35,13 @@ Optional: override API base URL with env `AIO_FFCPE_CATALOG_BASE_URL` or flag `-
 
 # Agent skills (Cursor & Claude Code)
 
-Full documentation for **Claude Code** slash commands, **Cursor** project vs global paths, marketplace install, and **`aio ffcpe install-skills`**: **[`claude-ffcpe/README.md`](./claude-ffcpe/README.md)**.
+Bundled skills ([`skills/`](./skills/): `aio-ffcpe-cli`, `ffcpe-catalog-entry-json`) use the [open agent skills](https://github.com/vercel-labs/skills) format. Install all of them with the [Skills CLI](https://github.com/vercel-labs/skills) ([skills.sh](https://skills.sh/)):
 
-Canonical skill sources: [`claude-ffcpe/skills/`](./claude-ffcpe/skills) (`aio-ffcpe-cli`, `ffcpe-catalog-entry-json`). After editing those files in a clone, run **`aio ffcpe sync-skills`** to refresh [`.cursor/skills/`](./.cursor/skills) (requires this plugin in **aio**).
+```sh-session
+npx skills add adobe/aio-cli-plugin-ffcpe --all -y
+```
+
+More options (agents, global scope, local clone): **[`skills/README.md`](./skills/README.md)**.
 
 # Commands
 <!-- commands -->
@@ -51,21 +55,18 @@ Canonical skill sources: [`claude-ffcpe/skills/`](./claude-ffcpe/skills) (`aio-f
 * [`aio ffcpe catalog register`](#aio-ffcpe-catalog-register)
 * [`aio ffcpe catalog update ACTIONTYPE`](#aio-ffcpe-catalog-update-actiontype)
 * [`aio ffcpe catalog validate`](#aio-ffcpe-catalog-validate)
-* [`aio ffcpe install-skills`](#aio-ffcpe-install-skills)
-* [`aio ffcpe sync-skills`](#aio-ffcpe-sync-skills)
 * [`aio help [COMMAND]`](#aio-help-command)
 
 ## `aio ffcpe`
 
-FFCPE (Firefly Creative Production for Enterprise) — aio ffcpe catalog (catalog API), aio ffcpe install-skills, aio ffcpe sync-skills
+FFCPE (Firefly Creative Production for Enterprise) — aio ffcpe catalog (catalog API)
 
 ```
 USAGE
   $ aio ffcpe
 
 DESCRIPTION
-  FFCPE (Firefly Creative Production for Enterprise) — aio ffcpe catalog (catalog API), aio ffcpe install-skills, aio
-  ffcpe sync-skills
+  FFCPE (Firefly Creative Production for Enterprise) — aio ffcpe catalog (catalog API)
 ```
 
 _See code: [src/commands/ffcpe/index.js](https://github.com/adobe/aio-cli-plugin-ffcpe/blob/0.0.0/src/commands/ffcpe/index.js)_
@@ -316,61 +317,6 @@ EXAMPLES
 ```
 
 _See code: [src/commands/ffcpe/catalog/validate.js](https://github.com/adobe/aio-cli-plugin-ffcpe/blob/0.0.0/src/commands/ffcpe/catalog/validate.js)_
-
-## `aio ffcpe install-skills`
-
-Copy bundled agent skills (claude-ffcpe/skills) into user home or a project (.claude/skills, .cursor/skills)
-
-```
-USAGE
-  $ aio ffcpe install-skills [-t claude|cursor|both] [-p [<path>]]
-
-FLAGS
-  -p, --project=[<path>]  Repo or app root (must exist). Defaults to the current directory when given without a path
-                          (--project or -p alone). Skills go under <project>/.claude/skills and/or
-                          <project>/.cursor/skills. Omit this flag for ~/.claude/skills and ~/.cursor/skills.
-  -t, --target=<option>   [default: both] Install destination: claude, cursor, or both
-                          <options: claude|cursor|both>
-
-DESCRIPTION
-  Copy bundled agent skills (claude-ffcpe/skills) into user home or a project (.claude/skills, .cursor/skills)
-
-EXAMPLES
-  $ aio ffcpe install-skills
-
-  $ aio ffcpe install-skills --target claude
-
-  $ aio ffcpe install-skills -t cursor
-
-  $ aio ffcpe install-skills -t both
-
-  $ aio ffcpe install-skills --project
-
-  $ aio ffcpe install-skills -p -t cursor
-
-  $ aio ffcpe install-skills -p .
-
-  $ aio ffcpe install-skills --project /path/to/repo -t cursor
-```
-
-_See code: [src/commands/ffcpe/install-skills.js](https://github.com/adobe/aio-cli-plugin-ffcpe/blob/0.0.0/src/commands/ffcpe/install-skills.js)_
-
-## `aio ffcpe sync-skills`
-
-Copy bundled agent skills into this package's .cursor/skills (for repo dev and npm prepack)
-
-```
-USAGE
-  $ aio ffcpe sync-skills
-
-DESCRIPTION
-  Copy bundled agent skills into this package's .cursor/skills (for repo dev and npm prepack)
-
-EXAMPLES
-  $ aio ffcpe sync-skills
-```
-
-_See code: [src/commands/ffcpe/sync-skills.js](https://github.com/adobe/aio-cli-plugin-ffcpe/blob/0.0.0/src/commands/ffcpe/sync-skills.js)_
 
 ## `aio help [COMMAND]`
 
