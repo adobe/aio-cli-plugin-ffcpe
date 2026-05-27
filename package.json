@@ -55,11 +55,11 @@
   "scripts": {
     "lint": "eslint src test",
     "posttest": "npm run lint",
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --testRegex '.+\\.test\\.js' --ci",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --ci",
     "prepack": "oclif manifest && oclif readme",
     "postpack": "rm -f oclif.manifest.json",
     "version": "oclif readme && git add README.md",
-    "e2e": "node --experimental-vm-modules node_modules/jest/bin/jest.js --collectCoverage=false --testRegex 'e2e/e2e.js'"
+    "e2e": "node --experimental-vm-modules node_modules/jest/bin/jest.js --collectCoverage=false --testMatch \"<rootDir>/e2e/e2e.js\""
   },
   "jest": {
     "collectCoverage": true,
@@ -75,6 +75,9 @@
       }
     },
     "testEnvironment": "node",
+    "testMatch": [
+      "<rootDir>/test/**/*.test.js"
+    ],
     "setupFilesAfterEnv": [
       "./jest.setup.js"
     ]
