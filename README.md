@@ -15,23 +15,11 @@ Adobe I/O CLI plugin for **FFCPE** (**Firefly Creative Production for Enterprise
 # Usage
 
 ```sh-session
-$ aio plugins:install https://github.com/Adobe-FFS-FDE/aio-cli-plugin-ffcpe
+$ aio plugins:install @adobe/aio-cli-plugin-ffcpe
 $ aio login
 $ aio console org select
 $ aio ffcpe catalog --help
 ```
-
-**From a local path** (run **`npm install`** in the plugin repo first):
-
-- **Symlink (recommended for development — changes apply immediately):**  
-  `aio plugins:link /absolute/path/to/aio-cli-plugin-ffcpe`  
-  (relative paths work from your current shell directory.)
-- **Copy install from disk:**  
-  `aio plugins:install file:/absolute/path/to/aio-cli-plugin-ffcpe`
-
-To remove a linked dev plugin: **`aio plugins:unlink`** (see **`aio plugins:unlink --help`** for the exact plugin name).
-
-Optional: override API base URL with env `AIO_FFCPE_CATALOG_BASE_URL` or flag `--base-url` on catalog commands.
 
 # Agent skills (Cursor & Claude Code)
 
@@ -338,6 +326,19 @@ DESCRIPTION
 
 _See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/6.2.46/src/commands/help.ts)_
 <!-- commandsstop -->
+
+## Development
+
+For development, it is useful to use aio plugins:link to link to a local clone of this repository rather than a specific npm module, e.g.
+
+```
+$ git clone git@github.com:adobe/aio-cli-plugin-ffcpe.git
+$ git checkout -B <your feature branch>
+$ npm install
+$ aio plugins:link
+$ aio ffcpe <some command>
+```
+
 
 ## Contributing
 
