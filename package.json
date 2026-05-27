@@ -53,7 +53,7 @@
   },
   "main": "src/commands/ffcpe/index.js",
   "scripts": {
-    "lint": "eslint src test e2e",
+    "lint": "eslint src test",
     "posttest": "npm run lint",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --testRegex '.+\\.test\\.js' --ci",
     "prepack": "oclif manifest && oclif readme",
@@ -63,6 +63,17 @@
   },
   "jest": {
     "collectCoverage": true,
+    "collectCoverageFrom": [
+      "src/**/*.js"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 100,
+        "functions": 100,
+        "lines": 100,
+        "statements": 100
+      }
+    },
     "testEnvironment": "node",
     "setupFilesAfterEnv": [
       "./jest.setup.js"

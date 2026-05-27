@@ -177,5 +177,23 @@ describe('catalog-client', () => {
     expect(filterCatalogListActions(undefined, { includeCore: false })).toEqual(
       []
     )
+    expect(filterCatalogListActions(mixed)).toEqual([custom])
+  })
+
+  test('catalogFetch resolves base URL without trailing slash', async () => {
+    const fetchSpy = jest
+      .spyOn(global, 'fetch')
+      .mockResolvedValue(new Response('', { status: 200 }))
+
+    await catalogFetch({
+      baseUrl: 'http://no-slash.example',
+      path: 'catalog/actions',
+      headers: {}
+    })
+
+    expect(fetchSpy.mock.calls[0][0].toString()).toMatch(
+      /^http:\/\/no-slash\.example\/catalog\/actions/
+    )
+    fetchSpy.mockRestore()
   })
 })

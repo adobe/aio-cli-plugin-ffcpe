@@ -10,18 +10,13 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-import { createRequire } from 'node:module'
-
 import config from '@adobe/aio-lib-core-config'
 import Logger from '@adobe/aio-lib-core-logging'
 
 import { CONSOLE_API_KEYS } from './console-api-keys.js'
+import LibConsoleCLI from '@adobe/aio-cli-lib-console'
 
 const aioLogger = Logger('ffcpe:org')
-
-const require = createRequire(import.meta.url)
-/** @type {typeof import('@adobe/aio-cli-lib-console')} */
-const LibConsoleCLI = require('@adobe/aio-cli-lib-console')
 
 /**
  * True when aio config already has a Console org (same shape as `aio console org select`).
