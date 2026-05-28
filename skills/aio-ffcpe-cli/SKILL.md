@@ -81,6 +81,29 @@ Run **`aio ffcpe catalog --help`** or **`aio ffcpe catalog <command> --help`** f
 
 The CLI does not scaffold entries interactively. Use the **`ffcpe-catalog-entry-json`** skill (or **`/aio-ffcpe-skills:ffcpe-catalog-entry-json`** when the plugin is installed), then **`aio ffcpe catalog validate -f ./catalog-entry.json`** and **`aio ffcpe catalog register`**.
 
+## Pre-registration: wiring the App Builder project
+
+Before registering, the App Builder app must be deployed and the local project wired to a Console workspace. The `aio console workspace` commands have **inconsistent flag shapes** — using the wrong flag throws `NonExistentFlagsError`:
+
+| Command | Correct flags |
+|---------|---------------|
+| `aio console workspace create` | `--projectName <name>` (required), `--name <name>` (required) |
+| `aio console workspace select` | positional `[NAME_OR_ID]` + optional `--projectId <id>` |
+| `aio console workspace list`   | `--projectId <id>` — **no `--projectName` flag** |
+| `aio console workspace download` | optional positional destination path |
+
+**Wiring a fresh `init-bare` project to Console** — `aio app use --no-input` fails when `.aio` has no context. Correct sequence:
+
+```sh-session
+aio console workspace download                        # downloads <orgId>-<project>-Stage.json
+echo '<orgId>-<project>-Stage.json' >> .gitignore     # ⚠️ do this before git add — file contains secrets
+aio app use <orgId>-<project>-Stage.json
+```
+
+The downloaded JSON file contains client credentials and API keys. The generated `.gitignore` does **not** cover this file automatically (it only covers `console.json` and `.env*`). Add the exact filename — or the pattern `[0-9]*-*-*.json` to cover all workspaces — to `.gitignore` immediately after download.
+
+See **`ffcpe-app-builder-actions`** skill for the full init-bare → deploy → register flow.
+
 ## Deeper docs
 
 - **`skills/README.md`** — agent skills (Claude **`/`** commands, Cursor paths, **`npx skills`** install).
