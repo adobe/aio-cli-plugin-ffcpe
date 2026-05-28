@@ -12,6 +12,23 @@ description: >-
 
 Use this skill to **author, review, or fix** a JSON document that registers an App Builder action with the **run-workflow** catalog so it can be used in workflows. For every catalog operation (list, register, inspect, …), use the **`aio ffcpe catalog`** commands from **@adobe/aio-cli-plugin-ffcpe**—do not suggest **`curl`** or ad-hoc HTTP clients.
 
+## File naming and placement (App Builder projects)
+
+**Best practice:** one catalog entry file **per custom action**, named **`<action-name>.entry.json`**, in the **same directory** as that action’s web and worker sources:
+
+```text
+actions/<action-name>/
+  <action-name>.web.ts
+  <action-name>.worker.ts
+  <action-name>.entry.json
+```
+
+- **`<action-name>`** should match the OpenWhisk action basename and your **`mountFfcpeNodeRoutes`** / manifest naming where practical.
+- The file content is the full catalog payload (**`handlerType: "custom-action"`**, **`inputs`** / **`outputs`**, **`customActionConfig`**, discovery fields)—not a stub or pointer file.
+- Pass this path to **`aio ffcpe catalog validate --file …`** and **`register --file …`**. A repo-root **`catalog-entry.json`** is fine for one-off samples; prefer **`<action-name>.entry.json`** co-located when the app has multiple actions.
+
+Scaffolding web/worker layout: skill **`ffcpe-app-builder-actions`** in [ffcpe-custom-node-sdk](https://github.com/adobe/ffcpe-custom-node-sdk).
+
 ## Install Adobe I/O CLI and the FFCPE plugin
 
 1. **Node.js** — Use a supported LTS version (this plugin expects **Node 18+**).
@@ -195,14 +212,14 @@ Always use **`aio ffcpe catalog …`** (this plugin), not raw HTTP. Prereqs: **`
 
 | Goal | Command |
 |------|---------|
-| Register new action | `aio ffcpe catalog register --file ./catalog-entry.json` (optional **`--strict`**) |
+| Register new action | `aio ffcpe catalog register --file ./actions/<action-name>/<action-name>.entry.json` (optional **`--strict`**) |
 | Inspect one action | `aio ffcpe catalog inspect <actionType>` (optional **`--version <semver>`**) |
 | List actions | `aio ffcpe catalog list` (filters: **`--workflow-enabled`**, **`--category`**, **`--include-tags`**, **`--exclude-tags`**, **`--include-core`**, **`--compact`**, **`--json`**) |
-| Full replace | `aio ffcpe catalog update <actionType> --file ./catalog-entry.json` (optional **`--version`**, **`--strict`**) |
+| Full replace | `aio ffcpe catalog update <actionType> --file ./actions/<action-name>/<action-name>.entry.json` (optional **`--version`**, **`--strict`**) |
 | Disable (hide from UI by default) | `aio ffcpe catalog disable <actionType>` |
 | Re-enable | `aio ffcpe catalog enable <actionType>` |
 | Delete | `aio ffcpe catalog delete <actionType>` (optional **`--version`** to delete one semver; omit to delete all custom versions for that type) |
-| Validate file only | `aio ffcpe catalog validate --file ./catalog-entry.json` |
+| Validate file only | `aio ffcpe catalog validate --file ./actions/<action-name>/<action-name>.entry.json` |
 
 Run **`aio ffcpe catalog <command> --help`** for the exact flag set.
 

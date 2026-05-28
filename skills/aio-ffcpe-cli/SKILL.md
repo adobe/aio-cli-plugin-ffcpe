@@ -60,7 +60,7 @@ If **`aio ffcpe`** is missing, run **`aio plugins`** and confirm this package is
 
 | Command | Purpose |
 |--------|---------|
-| **`aio ffcpe catalog validate`** | Local validation of a `catalog-entry.json` (no network). Use `--file` / `-f`. |
+| **`aio ffcpe catalog validate`** | Local validation of catalog entry JSON (typically **`<action-name>.entry.json`**). Use `--file` / `-f`. |
 | **`aio ffcpe catalog register`** | POST a new catalog entry from a JSON file. Validates first; optional **`--strict`** to fail on validation warnings. |
 | **`aio ffcpe catalog inspect ACTIONTYPE`** | GET one action; optional **`--version`** for a specific semver. |
 | **`aio ffcpe catalog list`** | GET catalog actions (supports filters per command help). |
@@ -77,9 +77,18 @@ Run **`aio ffcpe catalog --help`** or **`aio ffcpe catalog <command> --help`** f
 - **`--api-key`** — override `x-api-key` when needed.
 - **`--json`** — print raw API JSON where supported.
 
-## Authoring `catalog-entry.json`
+## Authoring catalog entries
 
-The CLI does not scaffold entries interactively. Use the **`ffcpe-catalog-entry-json`** skill (or **`/aio-ffcpe-skills:ffcpe-catalog-entry-json`** when the plugin is installed), then **`aio ffcpe catalog validate -f ./catalog-entry.json`** and **`aio ffcpe catalog register`**.
+The CLI does not scaffold entries interactively. Use the **`ffcpe-catalog-entry-json`** skill (or **`/aio-ffcpe-skills:ffcpe-catalog-entry-json`** when the plugin is installed).
+
+**Recommended layout in App Builder repos:** store each action’s catalog JSON as **`<action-name>.entry.json`** next to **`<action-name>.web.*`** and **`<action-name>.worker.*`** (e.g. **`actions/resize-image/resize-image.entry.json`**). That groups implementation and registration for one custom action. See **`ffcpe-app-builder-actions`** in [ffcpe-custom-node-sdk](https://github.com/adobe/ffcpe-custom-node-sdk).
+
+Then validate and register:
+
+```sh-session
+aio ffcpe catalog validate -f ./actions/resize-image/resize-image.entry.json
+aio ffcpe catalog register -f ./actions/resize-image/resize-image.entry.json
+```
 
 ## Pre-registration: wiring the App Builder project
 
