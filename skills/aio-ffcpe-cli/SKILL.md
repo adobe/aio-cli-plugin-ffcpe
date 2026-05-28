@@ -92,7 +92,21 @@ aio ffcpe catalog register -f ./actions/resize-image/resize-image.entry.json
 
 ## Pre-registration: wiring the App Builder project
 
-Before registering, the App Builder app must be deployed and the local project wired to a Console workspace. The `aio console workspace` commands have **inconsistent flag shapes** — using the wrong flag throws `NonExistentFlagsError`:
+Before registering, the App Builder app must be deployed and the local project wired to a Console workspace.
+
+### Console project naming
+
+| Rule | Detail |
+|------|--------|
+| Alphanumeric only | Hyphens rejected: `demo-qr-app` fails with `Project name … is invalid` |
+| Max 20 characters | Longer names fail at create time |
+| Name ≠ package | Console project (e.g. `demoQrFfcpe`) can differ from OpenWhisk **`runtimeManifest` package** (e.g. `demo-qr-custom-ffcpe-nodes`) |
+
+Stage and Production workspaces are created automatically with a new project.
+
+### Console CLI flag gotchas
+
+The `aio console workspace` commands have **inconsistent flag shapes** — using the wrong flag throws `NonExistentFlagsError`:
 
 | Command | Correct flags |
 |---------|---------------|
@@ -101,15 +115,37 @@ Before registering, the App Builder app must be deployed and the local project w
 | `aio console workspace list`   | `--projectId <id>` — **no `--projectName` flag** |
 | `aio console workspace download` | optional positional destination path |
 
-**Wiring a fresh `init-bare` project to Console** — `aio app use --no-input` fails when `.aio` has no context. Correct sequence:
+### Wire, build, deploy
 
 ```sh-session
-aio console workspace download                        # downloads <orgId>-<project>-Stage.json
-echo '<orgId>-<project>-Stage.json' >> .gitignore     # ⚠️ do this before git add — file contains secrets
-aio app use <orgId>-<project>-Stage.json
+aio console project create -n myproject -t "My FFCPE App" --json
+aio console project select myproject
+aio console workspace select Stage --projectId <PROJECT_ID>
+aio console workspace download myproject-Stage.json
+echo 'myproject-Stage.json' >> .gitignore
+aio app use myproject-Stage.json --overwrite --no-input
+aio app build
+aio app deploy
 ```
 
-The downloaded JSON file contains client credentials and API keys. The generated `.gitignore` does **not** cover this file automatically (it only covers `console.json` and `.env*`). Add the exact filename — or the pattern `[0-9]*-*-*.json` to cover all workspaces — to `.gitignore` immediately after download.
+Use **`--overwrite --no-input`** on **`aio app use`** when `.env` already exists from `aio app init` — otherwise the CLI prompts interactively and can hang in agent/CI sessions.
+
+The downloaded JSON file contains client credentials and API keys. The generated `.gitignore` does **not** cover this file automatically (it only covers `console.json` and `.env*`). Add the exact filename — or the pattern `[0-9]*-*-*.json` — immediately after download.
+
+### Post-deploy: endpoints → catalog → register
+
+1. Copy each **web action base URL** from deploy output.
+2. Set **`submitEndpoint`** = `{base}/submit`, **`statusEndpoint`** = `{base}/status` in **`<action-name>.entry.json`**.
+3. Set **`authentication`** to **`ims_service_token`** when using default SDK route auth (see **`ffcpe-catalog-entry-json`**).
+4. Register:
+
+```sh-session
+aio console org select
+aio ffcpe catalog validate -f ./actions/my-action/my-action.entry.json
+aio ffcpe catalog register -f ./actions/my-action/my-action.entry.json
+# or, if actionType already exists:
+aio ffcpe catalog update my-action -f ./actions/my-action/my-action.entry.json
+```
 
 See **`ffcpe-app-builder-actions`** skill for the full init-bare → deploy → register flow.
 

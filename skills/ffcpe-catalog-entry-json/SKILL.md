@@ -130,7 +130,20 @@ Discover valid `actionType` values with **`aio ffcpe catalog list`** (add **`--i
 
 ## Full catalog entry example
 
-Use HTTPS App Builder / Runtime API URLs (gateway style), not arbitrary untrusted hosts. Replace placeholders with your deployed endpoints.
+Use HTTPS App Builder / Runtime API URLs from **`aio app deploy`** output. Replace placeholders with your deployed web action base URL + route suffixes.
+
+**Deriving endpoints after deploy:**
+
+```text
+# Deploy prints:
+https://3326322-myproject-stage.adobeioruntime.net/api/v1/web/my-package/my-action-web
+
+# Catalog:
+submitEndpoint → …/my-action-web/submit
+statusEndpoint → …/my-action-web/status
+```
+
+Use **`/api/v1/web/`** (not `/apis/v1/`). The Runtime hostname namespace is lowercase.
 
 ```json
 {
@@ -187,24 +200,28 @@ Use HTTPS App Builder / Runtime API URLs (gateway style), not arbitrary untruste
 
   "handlerType": "custom-action",
   "customActionConfig": {
-    "submitEndpoint": "https://YOUR-PROJECT.adobeioruntime.net/apis/v1/your-action",
-    "statusEndpoint": "https://YOUR-PROJECT.adobeioruntime.net/apis/v1/status",
+    "submitEndpoint": "https://3326322-myproject-stage.adobeioruntime.net/api/v1/web/my-package/my-action-web/submit",
+    "statusEndpoint": "https://3326322-myproject-stage.adobeioruntime.net/api/v1/web/my-package/my-action-web/status",
     "pollIntervalMs": 3000,
     "maxPollAttempts": 100,
     "timeoutMs": 300000,
-    "authentication": { "type": "none" }
+    "authentication": { "type": "ims_service_token" }
   }
 }
 ```
 
 ## `customActionConfig.authentication`
 
+**Default for App Builder + `mountFfcpeNodeRoutes`:** use **`ims_service_token`**. The SDK enables IMS inbound auth on `/submit` and `/status` unless you pass **`authenticate: null`**. If the catalog declares **`none`** but the web action still requires IMS, run-workflow calls fail (and manual curl returns `Missing required header(s): Authorization, x-api-key`).
+
+Only use **`none`** when the web action explicitly disables auth (`authenticate: null` in **`mountFfcpeNodeRoutes`**) and your security review allows it.
+
 | JSON | Use case |
 |------|----------|
-| `{ "type": "none" }` | No authentication to your endpoints |
+| `{ "type": "ims_service_token" }` | **Recommended default.** Run-workflow obtains an IMS service token and calls your endpoints with **`x-api-key: run-workflow-service`** and **`Authorization`**. Matches default **`mountFfcpeNodeRoutes`** auth. |
+| `{ "type": "none" }` | No authentication — only when web action passes **`authenticate: null`** |
 | `{ "type": "api-key", "headerName": "X-API-Key", "secretName": "MY_API_KEY" }` | API key header; `secretName` references an env var or secret |
 | `{ "type": "bearer", "secretName": "MY_BEARER_TOKEN" }` | Bearer token from env/secret |
-| `{ "type": "ims_service_token" }` | Run-workflow obtains an **IMS service access token** and calls your endpoints with **`x-api-key: run-workflow-service`** and **`Authorization`** set accordingly (no extra fields in the catalog JSON). Use when your App Builder action expects that auth model. |
 
 ## Managing the catalog (Adobe I/O CLI)
 
@@ -289,7 +306,15 @@ Example action node forcing custom **`remove-background`**:
 
 ### Invalid endpoint URL
 
-- **`submitEndpoint`** / **`statusEndpoint`** must be valid **HTTPS** URLs (typically your API gateway / Runtime web action URLs).
+- **`submitEndpoint`** / **`statusEndpoint`** must be valid **HTTPS** URLs (typically your Runtime web action URLs).
+- Copy the **web action base URL** from **`aio app deploy`**, then append **`/submit`** and **`/status`**.
+- Use **`/api/v1/web/<package>/<web-action>`** — not **`/apis/v1/`**.
+
+### Auth mismatch (`Missing required header(s): Authorization, x-api-key`)
+
+- Default **`mountFfcpeNodeRoutes`** enables IMS inbound auth.
+- Catalog must declare **`"authentication": { "type": "ims_service_token" }`**, not **`none`**, unless the web action passes **`authenticate: null`**.
+- After fixing auth in **`.entry.json`**, run **`aio ffcpe catalog update <actionType> --file …`**.
 
 ### Action registered but workflow fails
 
